@@ -5,7 +5,7 @@ import { routes } from './routes';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
     RouterModule.forRoot(routes)
   ],
   exports:[
