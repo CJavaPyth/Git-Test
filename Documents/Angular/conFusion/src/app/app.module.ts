@@ -75,6 +75,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   entryComponents: [
     LoginComponent
   ]
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
