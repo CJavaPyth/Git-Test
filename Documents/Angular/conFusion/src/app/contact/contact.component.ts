@@ -28,8 +28,8 @@ export class ContactComponent implements OnInit {
   			telnum: [0, Validators.required],
   			email: ['', Validators.required],
   			agree: false,
-  			contacttype: 'None';
-  			message: '';
+  			contacttype: 'None',
+  			message: '',
   		});
   	}
 
