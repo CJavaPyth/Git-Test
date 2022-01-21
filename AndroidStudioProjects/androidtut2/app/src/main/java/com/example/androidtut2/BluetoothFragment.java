@@ -14,15 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.androidtut2.MainActivity;
 import com.example.androidtut2.R;
@@ -32,6 +37,47 @@ import java.util.ArrayList;
 
 public class BluetoothFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String TAG = "MainActivity";
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_bluetooth, container, false);
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothSwitch = (Switch) rootView.findViewById(R.id.bluetoothSwitch);
+        discoverableButton = (Button) rootView.findViewById(R.id.discoverableButton);
+        LvNewDevices = (ListView) rootView.findViewById(R.id.discoverableDevicesList);
+        mBTDevices = new ArrayList<>();
+        LvNewDevices.setOnItemClickListener(BluetoothFragment.this);
+
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+
+        requireActivity().registerReceiver(mBroadcastReceiver4, filter);
+
+
+        //Bluetooth on/off switch method
+        bluetoothSwitch.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Boolean switchState = bluetoothSwitch.isChecked();
+                enableDisableBT(switchState);
+            }
+        });
+
+
+        //discoverable button method
+        discoverableButton.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view){
+                enableDiscoverable();
+                btnDiscover();
+            }
+        });
+
+        return rootView;
+        }
     @Nullable
 
 
@@ -133,15 +179,15 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
                 //case 1 : bonded already
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Log.d(TAG, "BroadcastReceiver: BOND_BONDED");
-//                    Toast.makeText(getApplicationContext(), "Connected",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Connected",Toast.LENGTH_LONG).show();
                 }
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
                     Log.d(TAG, "BroadcastReceiver : BOND_BONDING");
-//                    Toast.makeText(getApplicationContext(), "Connecting",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Connecting",Toast.LENGTH_LONG).show();
                 }
                 if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
                     Log.d(TAG, "BroadcastReceiver : BOND_NONE");
-//                    Toast.makeText(getApplicationContext(), "Disconnected",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Disconnected",Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -152,53 +198,13 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     public void onDestroy() {
         Log.d(TAG, "onDestroy: called.");
         super.onDestroy();
-        unregisterReceiver(mBroadcastReceiver1);
-        unregisterReceiver(mBroadcastReceiver2);
-        unregisterReceiver(mBroadcastReceiver3);
-        unregisterReceiver(mBroadcastReceiver4);
+//        requireActivity().unregisterReceiver(mBroadcastReceiver1);
+//        requireActivity().unregisterReceiver(mBroadcastReceiver2);
+//        requireActivity().unregisterReceiver(mBroadcastReceiver3);
+//        requireActivity().unregisterReceiver(mBroadcastReceiver4);
 
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_bluetooth);
-
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
-        discoverableButton = (Button) findViewById(R.id.discoverableButton);
-        LvNewDevices = (ListView) findViewById(R.id.discoverableDevicesList);
-        mBTDevices = new ArrayList<>();
-        LvNewDevices.setOnItemClickListener(BluetoothFragment.this);
-
-
-        //Broadcasts when bond state changes (ie : pairing)
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(mBroadcastReceiver4, filter);
-
-
-        //Bluetooth on/off switch method
-        bluetoothSwitch.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Boolean switchState = bluetoothSwitch.isChecked();
-                enableDisableBT(switchState);
-            }
-        });
-
-
-        //discoverable button method
-        discoverableButton.setOnClickListener(new View.OnClickListener(){
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View view){
-                enableDiscoverable();
-                btnDiscover();
-            }
-        });
-
-    }
 
     //enable bluetooth method
     public void enableDisableBT(Boolean switchState) {
@@ -211,14 +217,14 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableBTIntent);
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
-            Toast.makeText(getApplicationContext(), "Turned On",Toast.LENGTH_LONG).show();
+            requireActivity().registerReceiver(mBroadcastReceiver1, BTIntent);
+            Toast.makeText(getContext(), "Turned On",Toast.LENGTH_LONG).show();
         }
         else {
             mBluetoothAdapter.disable();
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
-            Toast.makeText(getApplicationContext(), "Turned Off",Toast.LENGTH_LONG).show();
+            requireActivity().registerReceiver(mBroadcastReceiver1, BTIntent);
+            Toast.makeText(getContext(), "Turned Off",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -233,7 +239,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         startActivity(discoverableIntent);
 
         IntentFilter intentFilter = new IntentFilter(mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(mBroadcastReceiver2, intentFilter);
+        requireActivity().registerReceiver(mBroadcastReceiver2, intentFilter);
     }
 
 
@@ -252,7 +258,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             mBluetoothAdapter.startDiscovery();
 
             IntentFilter discoverDevicesIntent = new IntentFilter((BluetoothDevice.ACTION_FOUND));
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
+            requireActivity().registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
 
         }
         if (!mBluetoothAdapter.isDiscovering()){
@@ -261,7 +267,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             checkBTPermissions();
             mBluetoothAdapter.startDiscovery();
             IntentFilter discoverDevicesIntent = new IntentFilter((BluetoothDevice.ACTION_FOUND));
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
+            requireActivity().registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
         }
     }
 
@@ -288,8 +294,8 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkBTPermissions() {
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
-            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
+            int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),"Manifest.permission.ACCESS_FINE_LOCATION");
+            permissionCheck += ContextCompat.checkSelfPermission(getActivity(),"Manifest.permission.ACCESS_COARSE_LOCATION");
             if (permissionCheck != 0) {
                 this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001); //Any number
             }
@@ -303,19 +309,3 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
 
 
 
-
-
-//button OnClick method
-//    Button addButton = (Button) findViewById(R.id.addButton);
-//        addButton.setOnClickListener(new View.OnClickListener(){
-//        @Override
-//        public void onClick(View view){
-//            EditText firstNumEditText = (EditText) findViewById(R.id.firstNumEditText);
-//            EditText secondNumEditText = (EditText) findViewById(R.id.secondNumEditText);
-//            TextView resultTextView = (TextView) findViewById(R.id.resultTextView);
-//            int num1 = Integer.parseInt(firstNumEditText.getText().toString());
-//            int num2 = Integer.parseInt(secondNumEditText.getText().toString());
-//            int result= num1+num2;
-//            resultTextView.setText(result + "");
-//        }
-//    });

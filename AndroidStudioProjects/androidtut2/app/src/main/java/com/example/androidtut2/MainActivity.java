@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+    public BluetoothFragment BluetoothFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
