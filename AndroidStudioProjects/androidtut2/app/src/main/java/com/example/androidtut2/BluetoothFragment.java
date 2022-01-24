@@ -154,7 +154,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             if (action.equals(BluetoothDevice.ACTION_FOUND)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                if (!mBTDevices.contains(device)){
+                if (!mBTDevices.contains(device) && device.getName()!=null){
                     mBTDevices.add(device);
                 }
 
