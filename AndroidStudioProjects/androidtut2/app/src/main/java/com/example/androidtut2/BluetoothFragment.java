@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,11 +33,15 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.androidtut2.MainActivity;
 import com.example.androidtut2.R;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class BluetoothFragment extends Fragment implements AdapterView.OnItemClickListener {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "BluetoothFragment";
+
+    BluetoothConnectionService mBluetoothConnection;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +55,12 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         LvNewDevices = (ListView) rootView.findViewById(R.id.discoverableDevicesList);
         mBTDevices = new ArrayList<>();
         LvNewDevices.setOnItemClickListener(BluetoothFragment.this);
+
+        //sending texts
+        sendButton = (Button) rootView.findViewById(R.id.sendTextButton);
+        connectButton = (Button) rootView.findViewById(R.id.connectButton);
+        sendText = (EditText) rootView.findViewById(R.id.sendText);
+
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
 
@@ -76,10 +87,26 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             }
         });
 
+        //startConnection button method
+        connectButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Log.d(TAG, "start connection, connectButton pressed");
+                startConnection();
+            }
+        });
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byte[] bytes = sendText.getText().toString().getBytes(Charset.defaultCharset());
+                mBluetoothConnection.write(bytes);
+
+            }
+        });
+
         return rootView;
         }
-    @Nullable
-
 
     BluetoothAdapter mBluetoothAdapter;
     Switch bluetoothSwitch;
@@ -88,7 +115,22 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     public DeviceListAdapter mDeviceListAdapter;
     ListView LvNewDevices;
 
+    //send text
+    Button connectButton;
+    Button sendButton;
+    BluetoothDevice mBTDevice;
+    EditText sendText;
+    private final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    //startBluetoothConnection
+    public void startConnection(){
+        startBTConnection(mBTDevice,MY_UUID_INSECURE);
+    }
+
+    public void startBTConnection(BluetoothDevice device, UUID uuid){
+        Log.d(TAG, "startBTConnection: Initializing RFCOM Bluetooth Connection.");
+        mBluetoothConnection.startClient(device,uuid);
+    }
     // Create a BroadcastReceiver for ON/OFF BLUETOOTH
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -179,6 +221,8 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
                 //case 1 : bonded already
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Log.d(TAG, "BroadcastReceiver: BOND_BONDED");
+                    //set global device as the device that is connected.
+                    mBTDevice = mDevice;
                     Toast.makeText(getContext(), "Connected",Toast.LENGTH_LONG).show();
                 }
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
@@ -287,6 +331,9 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Log.d(TAG, "Trying to pair with" + deviceName);
             mBTDevices.get(i).createBond();
+            mBTDevice = mBTDevices.get(i);
+            mBluetoothConnection = new BluetoothConnectionService(getContext());
+
         }
     }
 
