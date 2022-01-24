@@ -277,7 +277,11 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "===================");
             String text = intent.getStringExtra("theMessage");
+
+            //duplication
+            Log.d(TAG, "InputText" + text);
             messages.append(text + "\n");
             receivedString.setText(messages);
         }
