@@ -21,14 +21,14 @@
 
         <ListView
             android:id="@+id/discoverableDevicesList"
-            android:layout_width="346dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="48dp"
+            android:layout_width="422dp"
+            android:layout_height="281dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.446"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sendButton"
-            app:layout_constraintVertical_bias="0.928" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.895" />
 
         <TextView
             android:id="@+id/textView"
@@ -43,6 +43,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!--        <Switch-->
+        <!--            android:id="@+id/bluetoothSwitch"-->
+        <!--            android:layout_width="130dp"-->
+        <!--            android:layout_height="18dp"-->
+        <!--            android:layout_marginBottom="70dp"-->
+        <!--            android:minHeight="48dp"-->
+        <!--            android:text="Bluetooth"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintHorizontal_bias="0.288"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent"-->
+        <!--            app:layout_constraintVertical_bias="0.114"-->
+        <!--            tools:ignore="TouchTargetSizeCheck" />-->
+
         <Button
             android:id="@+id/discoverableButton"
             android:layout_width="wrap_content"
@@ -50,39 +65,23 @@
             android:text="SCAN"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.633"
+            app:layout_constraintHorizontal_bias="0.808"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.096" />
-
-        <Switch
-            android:id="@+id/bluetoothSwitch"
-            android:layout_width="130dp"
-            android:layout_height="18dp"
-            android:layout_marginBottom="70dp"
-            android:minHeight="48dp"
-            android:text="Bluetooth"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.288"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.114"
-            tools:ignore="TouchTargetSizeCheck" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/sendText"
-            android:layout_width="369dp"
-            android:layout_height="96dp"
+            android:layout_width="311dp"
+            android:layout_height="91dp"
             android:ems="10"
             android:hint="Enter text here"
             android:inputType="textPersonName"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.189"
+            app:layout_constraintHorizontal_bias="0.182"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.227" />
+            app:layout_constraintVertical_bias="0.121" />
 
         <Button
             android:id="@+id/sendTextButton"
@@ -92,33 +91,48 @@
             android:text="SEND"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.47"
+            app:layout_constraintHorizontal_bias="0.335"
             app:layout_constraintStart_toEndOf="@+id/sendText"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.391" />
+            app:layout_constraintVertical_bias="0.211" />
 
         <Button
             android:id="@+id/connectButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="70dp"
-            android:text="connect"
+            android:text="connect to paired device"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.345"
-            app:layout_constraintStart_toEndOf="@+id/discoverableButton"
+            app:layout_constraintHorizontal_bias="0.718"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.104" />
+            app:layout_constraintVertical_bias="0.616" />
 
         <TextView
             android:id="@+id/receivedString"
-            android:layout_width="496dp"
-            android:layout_height="65dp"
+            android:layout_width="438dp"
+            android:layout_height="154dp"
             android:text="Received message"
             app:layout_constraintBottom_toTopOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.325"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sendText" />
+            app:layout_constraintTop_toBottomOf="@+id/sendText"
+            app:layout_constraintVertical_bias="0.475" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Received Text"
+            android:textColor="#000000"
+            app:layout_constraintBottom_toTopOf="@+id/receivedString"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.103"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sendText"
+            app:layout_constraintVertical_bias="0.586" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
