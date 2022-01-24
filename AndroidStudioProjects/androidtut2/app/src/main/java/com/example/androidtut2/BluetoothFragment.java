@@ -28,6 +28,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.androidtut2.MainActivity;
@@ -39,31 +40,48 @@ import java.util.UUID;
 
 
 public class BluetoothFragment extends Fragment implements AdapterView.OnItemClickListener {
+
+    //attributes
     private static final String TAG = "BluetoothFragment";
+    BluetoothAdapter mBluetoothAdapter;
+    Switch bluetoothSwitch;
+    Button discoverableButton;
+    public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
+    public DeviceListAdapter mDeviceListAdapter;
+    ListView LvNewDevices;
 
+    //send text attributes
     BluetoothConnectionService mBluetoothConnection;
+    Button connectButton;
+    Button sendButton;
+    BluetoothDevice mBTDevice;
+    EditText sendText;
+    TextView receivedString;
+    StringBuilder messages;
 
+
+    private final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+
+    //methods
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_bluetooth, container, false);
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothSwitch = (Switch) rootView.findViewById(R.id.bluetoothSwitch);
         discoverableButton = (Button) rootView.findViewById(R.id.discoverableButton);
         LvNewDevices = (ListView) rootView.findViewById(R.id.discoverableDevicesList);
         mBTDevices = new ArrayList<>();
         LvNewDevices.setOnItemClickListener(BluetoothFragment.this);
-
-        //sending texts
         sendButton = (Button) rootView.findViewById(R.id.sendTextButton);
         connectButton = (Button) rootView.findViewById(R.id.connectButton);
         sendText = (EditText) rootView.findViewById(R.id.sendText);
-
+        receivedString= (TextView) rootView.findViewById(R.id.receivedString);
+        messages = new StringBuilder();
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-
         requireActivity().registerReceiver(mBroadcastReceiver4, filter);
 
 
@@ -101,26 +119,16 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             public void onClick(View view) {
                 byte[] bytes = sendText.getText().toString().getBytes(Charset.defaultCharset());
                 mBluetoothConnection.write(bytes);
+                sendText.setText("");
 
             }
         });
 
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
+
         return rootView;
         }
 
-    BluetoothAdapter mBluetoothAdapter;
-    Switch bluetoothSwitch;
-    Button discoverableButton;
-    public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
-    public DeviceListAdapter mDeviceListAdapter;
-    ListView LvNewDevices;
-
-    //send text
-    Button connectButton;
-    Button sendButton;
-    BluetoothDevice mBTDevice;
-    EditText sendText;
-    private final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     //startBluetoothConnection
     public void startConnection(){
@@ -131,6 +139,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         Log.d(TAG, "startBTConnection: Initializing RFCOM Bluetooth Connection.");
         mBluetoothConnection.startClient(device,uuid);
     }
+
     // Create a BroadcastReceiver for ON/OFF BLUETOOTH
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -237,6 +246,15 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         }
     };
 
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String text = intent.getStringExtra("theMessage");
+            messages.append(text + "\n");
+            receivedString.setText(messages);
+        }
+    };
+
 
     @Override
     public void onDestroy() {
@@ -322,10 +340,8 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         //first cancel discovery because its memory intensive.
         mBluetoothAdapter.cancelDiscovery();
         String deviceName = mBTDevices.get(i).getName();
-        String deviceAddress = mBTDevices.get(i).getAddress();
 
         Log.d(TAG, "onItemClick : deviceName = "+ deviceName);
-        Log.d(TAG, "onItemClick : deviceAddress = "+ deviceAddress);
 
         //create the bond
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {

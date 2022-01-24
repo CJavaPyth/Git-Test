@@ -6,8 +6,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +19,6 @@ import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-/**
- * Created by User on 12/21/2016.
- */
 
 public class BluetoothConnectionService {
     private static final String TAG = "BluetoothConnectionServ";
@@ -77,8 +77,7 @@ public class BluetoothConnectionService {
             BluetoothSocket socket = null;
 
             try{
-                // This is a blocking call and will only return on a
-                // successful connection or an exception
+
                 Log.d(TAG, "run: RFCOM server socket start.....");
 
                 socket = mmServerSocket.accept();
@@ -271,6 +270,9 @@ public class BluetoothConnectionService {
                     bytes = mmInStream.read(buffer);
                     String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG, "InputStream: " + incomingMessage);
+                    Intent incomingMessageIntent = new Intent("incomingMessage");
+                    incomingMessageIntent.putExtra("theMessage", incomingMessage);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(incomingMessageIntent);
                 } catch (IOException e) {
                     Log.e(TAG, "write: Error reading Input Stream. " + e.getMessage() );
                     break;
